@@ -286,20 +286,20 @@ test('Switching tabs keeps only terms in search term', async () => {
   expect(myExtension1).toBeInTheDocument();
 });
 
-test.each(['installed', 'catalog'] as const)(
+test.each(['installed', 'catalog', 'development'] as const)(
   '%s search is below the tabs and outside the page header',
   async currentScreen => {
     render(ExtensionList, { screen: currentScreen });
 
     const catalogTab = await screen.findByRole('button', { name: 'Catalog' });
-    const searchInput = screen.getByRole('textbox', { name: 'search extensions' });
+    const searchInput = await screen.findByRole('textbox', { name: 'search extensions' });
     expect(screen.getAllByRole('textbox', { name: 'search extensions' })).toHaveLength(1);
     expect(catalogTab.compareDocumentPosition(searchInput) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(screen.getByRole('region', { name: 'content' })).toContainElement(searchInput);
   },
 );
 
-test.each(['installed', 'catalog'] as const)(
+test.each(['installed', 'catalog', 'development'] as const)(
   '%s search stays above scrolling content with an opaque themed background',
   async currentScreen => {
     render(ExtensionList, { screen: currentScreen });
@@ -336,15 +336,15 @@ test.each(['installed', 'catalog'] as const)(
   },
 );
 
-test('Local extensions keeps search above the tabs', async () => {
+test('The shared search toolbar remains visible when the selected Local feature is disabled', async () => {
+  vi.mocked(window.getConfigurationValue).mockImplementation(async key => key !== 'extensions.localExtensions.enabled');
   render(ExtensionList, { screen: 'development' });
 
-  const catalogTab = await screen.findByRole('button', { name: 'Catalog' });
-  const searchInput = screen.getByRole('textbox', { name: 'search extensions' });
-  expect(screen.getAllByRole('textbox', { name: 'search extensions' })).toHaveLength(1);
-  expect(searchInput.compareDocumentPosition(catalogTab) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-  expect(screen.getByRole('region', { name: 'content' })).not.toContainElement(searchInput);
-  expect(screen.queryByText('Install status')).not.toBeInTheDocument();
+  await screen.findByRole('button', { name: 'Catalog' });
+  expect(screen.queryByRole('button', { name: 'Local extensions' })).not.toBeInTheDocument();
+  expect(screen.getByRole('region', { name: 'search' })).toContainElement(
+    screen.getByRole('textbox', { name: 'search extensions' }),
+  );
 });
 
 test('Catalog install status shares the sticky search row', async () => {
@@ -602,7 +602,7 @@ test('Switching tabs preserves search text between installed, catalog and local 
   const localSearchInput = screen.getByRole('textbox', { name: 'search extensions' });
   expect(localSearchInput).toHaveValue('bar');
   expect(screen.getAllByRole('textbox', { name: 'search extensions' })).toHaveLength(1);
-  expect(screen.getByRole('region', { name: 'content' })).not.toContainElement(localSearchInput);
+  expect(screen.getByRole('region', { name: 'content' })).toContainElement(localSearchInput);
 
   await fireEvent.click(screen.getByRole('button', { name: 'Installed' }));
 
