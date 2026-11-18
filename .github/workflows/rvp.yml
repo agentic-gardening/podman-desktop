@@ -3,7 +3,7 @@
 #
 #   /rvp check that the search field of the Local extensions tab is below the tabs
 #   /rvp macos check that ...          (linux by default; windows and macos also work)
-#   /rvp model=qwen3.5:4b check that ...   (another Ollama model; can be combined with the runner)
+#   /rvp model=mistralrs-community/Qwen3.5-4B-UQFF check that ...   (another UQFF model; can be combined with the runner)
 #
 # The result comes back as a comment on the same pull request.
 #
@@ -68,12 +68,12 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: agentic-gardening/rvp/agent@3c775a673cb6618feb5ce36cc0ff1d470dbf8eef # main
+      - uses: agentic-gardening/rvp/agent@aa47d8b9761d09d088a2d16656729e620d22b645 # main
         with:
           pr: ${{ github.event.issue.number }}
           repo: ${{ github.repository }}
           instruction: ${{ needs.parse.outputs.instruction }}
-          model: ${{ needs.parse.outputs.model || 'qwen3.5:9b' }}
+          model: ${{ needs.parse.outputs.model || 'mistralrs-community/Qwen3.5-9B-UQFF' }}
 
   # Holds the write token, runs neither the pull request's code nor the model.
   comment:
@@ -89,7 +89,7 @@ jobs:
         with:
           name: rvp-result
           path: result
-      - uses: agentic-gardening/rvp/comment@3c775a673cb6618feb5ce36cc0ff1d470dbf8eef # main
+      - uses: agentic-gardening/rvp/comment@aa47d8b9761d09d088a2d16656729e620d22b645 # main
         with:
           dir: result
           repo: ${{ github.repository }}
