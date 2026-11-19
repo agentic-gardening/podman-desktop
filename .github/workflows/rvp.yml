@@ -9,7 +9,7 @@
 #
 # The result comes back as a comment on the same pull request.
 #
-# Replace 49b514f846f8ad468d55faed803d697accfcc945 # main (twice) with a commit of agentic-gardening/rvp: organizations often only allow
+# Replace <commit-sha> (twice) with a commit of agentic-gardening/rvp: organizations often only allow
 # actions pinned to a full commit SHA, and a pinned version does not change under you.
 name: rvp
 run-name: rvp on #${{ github.event.issue.number }}
