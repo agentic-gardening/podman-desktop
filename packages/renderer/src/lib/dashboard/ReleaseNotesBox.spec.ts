@@ -23,6 +23,7 @@ import userEvent from '@testing-library/user-event';
 import { tick } from 'svelte';
 import { beforeAll, beforeEach, expect, test, vi } from 'vitest';
 
+import { DASHBOARD_SECTION_CONTEXT } from '/@/lib/dashboard/dashboard-section-context';
 import { onDidChangeConfiguration } from '/@/stores/configurationProperties';
 import { updateAvailable } from '/@/stores/update-store';
 
@@ -119,7 +120,7 @@ test('expect image to be hidden if there is a loading error', async () => {
 test('expect no release notes available', async () => {
   podmanDesktopGetReleaseNotesMock.mockResolvedValue({
     releaseNotesAvailable: false,
-    notesURL: `appRepo/release-summary`,
+    notesURL: 'appRepo/release-summary',
   });
 
   render(ReleaseNotesBox);
@@ -228,4 +229,36 @@ test('hide release notes on configuration change to current version value', asyn
   expect(screen.queryByText(responseJSON.title)).not.toBeInTheDocument();
   expect(screen.queryByText(responseJSON.summary)).not.toBeInTheDocument();
   expect(screen.queryByRole('img')).not.toBeInTheDocument();
+});
+
+test('legacy layout keeps the rounded-md corners', async () => {
+  render(ReleaseNotesBox);
+  const title = await screen.findByText(responseJSON.title);
+  const card = title.closest('.h-\\[200px\\]');
+  expect(card).toHaveClass('rounded-md');
+  expect(card).not.toHaveClass('rounded-lg');
+});
+
+test('enhanced layout uses the rounded-lg corners', async () => {
+  const dashboard = { enhanced: true };
+  render(ReleaseNotesBox, { context: new Map([[DASHBOARD_SECTION_CONTEXT, dashboard]]) });
+  const title = await screen.findByText(responseJSON.title);
+  const card = title.closest('.h-\\[200px\\]');
+  expect(card).toHaveClass('rounded-lg');
+  expect(card).not.toHaveClass('rounded-md');
+});
+
+test('enhanced layout uses rounded-lg for the unavailable notes card', async () => {
+  podmanDesktopGetReleaseNotesMock.mockResolvedValue({
+    releaseNotesAvailable: false,
+    notesURL: 'appRepo/release-summary',
+  });
+  render(ReleaseNotesBox, { context: new Map([[DASHBOARD_SECTION_CONTEXT, { enhanced: true }]]) });
+
+  const message = await screen.findByText(
+    'Release notes are currently unavailable, please check again later or try this',
+  );
+  const card = message.closest('.p-5');
+  expect(card).toHaveClass('rounded-lg');
+  expect(card).not.toHaveClass('rounded-md');
 });
