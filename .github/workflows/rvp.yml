@@ -73,7 +73,7 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: agentic-gardening/rvp/agent@6773cff90d37fa1763a16f73f1d5ee65e3d9ac63 # main
+      - uses: agentic-gardening/rvp/agent@210a2b1ed847bee7c99ffaaa0807c4196818280f # main
         with:
           pr: ${{ github.event.issue.number }}
           repo: ${{ github.repository }}
@@ -96,7 +96,7 @@ jobs:
         with:
           name: rvp-result
           path: result
-      - uses: agentic-gardening/rvp/comment@6773cff90d37fa1763a16f73f1d5ee65e3d9ac63 # main
+      - uses: agentic-gardening/rvp/comment@210a2b1ed847bee7c99ffaaa0807c4196818280f # main
         with:
           dir: result
           repo: ${{ github.repository }}
