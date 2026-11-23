@@ -1,0 +1,38 @@
+# Adds 1 domain/* and up to 2 area/* labels to the issues benoitf opens here, picked by a local d3 model
+# (review-processing/action-label-triager) with the labels, descriptions and past issues of
+# podman-desktop/podman-desktop. Labels missing here are created with podman-desktop's color and description.
+# By hand (Actions -> label-triage -> Run workflow): any issue, dry run by default (result in the run summary).
+name: label-triage
+run-name: label-triage on #${{ github.event.issue.number || inputs.issue }}
+
+on:
+  issues:
+    types: [opened, reopened]
+  workflow_dispatch:
+    inputs:
+      issue:
+        description: Issue number
+        required: true
+        type: string
+      dry-run:
+        description: Only report the labels, add nothing
+        type: boolean
+        default: true
+
+permissions: {}
+
+jobs:
+  triage:
+    if: github.event_name == 'workflow_dispatch' || github.event.issue.user.login == 'benoitf'
+    runs-on: ubuntu-26.04-arm
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      issues: write # add the labels, and create the missing ones
+    concurrency: label-triage-${{ github.event.issue.number || inputs.issue }}
+    steps:
+      - uses: review-processing/action-label-triager@729170d7ef35cef5d31b2e550115dc22eef6d7c0 # main
+        with:
+          issue: ${{ github.event.issue.number || inputs.issue }}
+          labels-repo: podman-desktop/podman-desktop
+          dry-run: ${{ github.event_name == 'workflow_dispatch' && format('{0}', inputs.dry-run) || 'false' }}
