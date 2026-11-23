@@ -31,7 +31,7 @@ jobs:
       issues: write # add the labels, and create the missing ones
     concurrency: label-triage-${{ github.event.issue.number || inputs.issue }}
     steps:
-      - uses: review-processing/action-label-triager@2ac8282cb714a2dff0f4e0253c45a8bc956efa13 # main
+      - uses: review-processing/action-label-triager@8f1390981d1401ab6b440c588de790bf724a6836 # main
         with:
           issue: ${{ github.event.issue.number || inputs.issue }}
           labels-repo: podman-desktop/podman-desktop
