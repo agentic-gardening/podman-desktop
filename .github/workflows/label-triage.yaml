@@ -35,4 +35,6 @@ jobs:
         with:
           issue: ${{ github.event.issue.number || inputs.issue }}
           labels-repo: podman-desktop/podman-desktop
+          # by hand: triage even an issue that already has a domain label
+          force: ${{ github.event_name == 'workflow_dispatch' }}
           dry-run: ${{ github.event_name == 'workflow_dispatch' && format('{0}', inputs.dry-run) || 'false' }}
